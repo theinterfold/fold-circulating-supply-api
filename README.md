@@ -38,11 +38,22 @@ gitignored `.env.local`) and delete that file when you are done.
 If `RPC_URL` is unset the endpoints return `503` on every request, so set it
 *before* giving the URL to CoinGecko.
 
-The RPC must allow `eth_getLogs` over a ~350k block range. Free tiers from
-Alchemy, Infura, Ankr and drpc all do. **Unauthenticated public RPCs do not** —
-every one tested either caps log ranges at 25–10,000 blocks or refuses archive
-reads. `RPC_URL` accepts several comma-separated URLs and uses the extras as
-automatic fallbacks.
+The RPC must serve `eth_getLogs` across a ~350k block range. Free tiers from
+Alchemy, Infura, Ankr and drpc all do. If the provider caps the range or the
+response size, the scan shrinks its window and retries **in parallel**, so a cap
+costs a little latency rather than a function timeout. Measured: whole range in
+one request ~1.5s; forced down to 500-block windows, ~7.9s — same answer to the
+wei. (Alchemy's real limit is 10,000 logs per response, not a block range.)
+
+`RPC_URL` accepts several comma-separated URLs and uses the extras as automatic
+fallbacks. Surrounding quotes and stray whitespace are tolerated. Of the
+unauthenticated public endpoints, `https://eth.drpc.org` works as a fallback;
+`ethereum-rpc.publicnode.com` and `rpc.ankr.com/eth` do not.
+
+If `RPC_URL` is missing or malformed the endpoint says so directly —
+`{"error":"server misconfigured: RPC_URL is invalid: an entry of 55 chars is
+missing an https:// scheme"}` — describing the value without echoing it, since
+it carries the API key. Every other failure returns the generic message.
 
 ## The whole calculation
 
