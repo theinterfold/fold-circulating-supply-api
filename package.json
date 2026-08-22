@@ -1,0 +1,13 @@
+{
+  "name": "fold-supply-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "CoinGecko total-supply and circulating-supply endpoints for Interfold (FOLD), computed live from Ethereum mainnet.",
+  "dependencies": {
+    "viem": "^2.55.19"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
